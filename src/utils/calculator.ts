@@ -1,4 +1,5 @@
 import { jStat } from 'jstat';
+import type { MachineSpec } from '../data/machineSpecs';
 
 export interface SettingResult {
     setting: number;
@@ -72,7 +73,7 @@ export const calculateSettingLikelihood = (
 
         // ブドウは任意入力
         if (specs.grape && grapeCount > 0) {
-            probs.push(1 / specs.grape);
+            probs.push(pGrape);
             observed.push(grapeCount);
         }
 

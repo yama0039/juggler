@@ -75,12 +75,7 @@ const AnalyzerResult: React.FC<AnalyzerResultProps> = ({ results, machine, input
                         <Tooltip
                             contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151' }}
                             itemStyle={{ color: '#fff' }}
-                            formatter={(value: any, name: string) => {
-                                // データから対応する設定のp値を取得
-                                const settingName = (name === 'prob' || name === 'uv') ?  // ツールチップの挙動による
-                                    'prob' : name;
-                                return [`${value.toFixed(1)}%`, '期待度'];
-                            }}
+                            formatter={(value: any) => [`${Number(value).toFixed(1)}%`, '期待度']}
                             labelStyle={{ color: '#e5e7eb' }}
                         />
                         <Bar dataKey="prob" radius={[4, 4, 0, 0]}>
