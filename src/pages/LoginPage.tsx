@@ -31,9 +31,9 @@ const LoginPage = () => {
                     email,
                     password,
                     options: {
-                        // 現在のURL（オリジン + パス）をリダイレクト先として設定
-                        // これにより、サブディレクトリ（/juggler/）にデプロイされている場合でも正しくリダイレクトされる
-                        emailRedirectTo: `${window.location.origin}${window.location.pathname}`,
+                        emailRedirectTo: window.location.hostname === 'yama0039.github.io'
+                            ? 'https://yama0039.github.io/juggler/'
+                            : window.location.origin,
                     },
                 });
                 if (error) throw error;
@@ -147,9 +147,12 @@ const LoginPage = () => {
                 {/* Debug Info */}
                 <div className="mt-4 p-4 bg-gray-900 rounded text-xs text-gray-400 break-all">
                     <p className="font-bold mb-1">Debug Info:</p>
-                    <p>Current Origin: {window.location.origin}</p>
-                    <p>Current Path: {window.location.pathname}</p>
-                    <p>Redirect URL to be sent: {`${window.location.origin}${window.location.pathname}`}</p>
+                    <p>Hostname: {window.location.hostname}</p>
+                    <p>Redirect URL: {
+                        window.location.hostname === 'yama0039.github.io'
+                            ? 'https://yama0039.github.io/juggler/'
+                            : window.location.origin
+                    }</p>
                 </div>
             </div>
         </div>
