@@ -31,7 +31,9 @@ const LoginPage = () => {
                     email,
                     password,
                     options: {
-                        emailRedirectTo: window.location.origin,
+                        // 現在のURL（オリジン + パス）をリダイレクト先として設定
+                        // これにより、サブディレクトリ（/juggler/）にデプロイされている場合でも正しくリダイレクトされる
+                        emailRedirectTo: `${window.location.origin}${window.location.pathname}`,
                     },
                 });
                 if (error) throw error;
