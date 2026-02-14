@@ -88,7 +88,7 @@ const CircleCounter: React.FC<CircleCounterProps> = ({ label, count, totalSpins,
             <button
                 onClick={onClick}
                 className={clsx(
-                    "relative w-36 h-36 rounded-full flex items-center justify-center transition-all duration-150 transform active:scale-95",
+                    "relative w-28 h-28 rounded-full flex items-center justify-center transition-all duration-150 transform active:scale-95",
                     "bg-gray-900 border-2",
                     styles.border,
                     styles.shadow,
@@ -122,23 +122,23 @@ const CircleCounter: React.FC<CircleCounterProps> = ({ label, count, totalSpins,
                         fill="transparent"
                         stroke="currentColor"
                         strokeWidth="3"
-                        strokeDasharray="280"
-                        strokeDashoffset="60" // Just for style
+                        strokeDasharray="220" /* Adjusted for smaller circumference approx 2 * PI * 40ish */
+                        strokeDashoffset="50" // Just for style
                         strokeLinecap="round"
                         className={clsx(styles.text, "filter drop-shadow-[0_0_3px_currentColor]")}
                     />
                 </svg>
 
                 {/* Content */}
-                <div className="flex flex-col items-center z-10 space-y-1">
-                    <span className={clsx("text-[10px] font-bold uppercase tracking-widest text-white/70")}>
+                <div className="flex flex-col items-center z-10 space-y-0.5">
+                    <span className={clsx("text-[9px] font-bold uppercase tracking-widest text-white/70")}>
                         {label}
                     </span>
-                    <span className={clsx("text-5xl font-mono font-bold leading-none text-white drop-shadow-lg", styles.text)}>
+                    <span className={clsx("text-3xl font-mono font-bold leading-none text-white drop-shadow-lg", styles.text)}>
                         {count}
                     </span>
-                    <div className="px-2 py-0.5 rounded bg-black/40 border border-white/10 backdrop-blur-sm">
-                        <span className={clsx("text-xs font-mono font-bold", styles.text)}>
+                    <div className="px-1.5 py-0.5 rounded bg-black/40 border border-white/10 backdrop-blur-sm">
+                        <span className={clsx("text-[10px] font-mono font-bold", styles.text)}>
                             1/{probability}
                         </span>
                     </div>
