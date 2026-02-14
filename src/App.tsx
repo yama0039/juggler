@@ -1,7 +1,13 @@
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import Layout from './components/Layout';
-// ... imports
+import ProtectedRoute from './components/Auth/ProtectedRoute';
+import Home from './pages/Home';
+import LoginPage from './pages/LoginPage';
+import AnalyzerPage from './pages/AnalyzerPage';
+import RecordPage from './pages/RecordPage';
+import HistoryPage from './pages/HistoryPage';
+import CounterPage from './pages/CounterPage';
 
 function App() {
   return (
