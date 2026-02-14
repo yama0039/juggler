@@ -30,6 +30,9 @@ const LoginPage = () => {
                 const { error } = await supabase.auth.signUp({
                     email,
                     password,
+                    options: {
+                        emailRedirectTo: window.location.origin,
+                    },
                 });
                 if (error) throw error;
                 setMessage('確認メールを送信しました。メール内のリンクをクリックして登録を完了してください。');
