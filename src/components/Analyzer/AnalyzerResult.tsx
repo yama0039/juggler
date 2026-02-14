@@ -26,10 +26,17 @@ const AnalyzerResult: React.FC<AnalyzerResultProps> = ({ results, machine, input
         return parseInt(a.name.replace('設定', '')) - parseInt(b.name.replace('設定', ''));
     });
 
-    // 最も可能性が高い設定
+    // 最も可能性が高い設定 (事後確率に加え、p値も考慮したほうが良いかもしれないが、基本は事後確率でOK)
+    // ユーザーの要望「尤もらしい設定を推測するようにアルゴリズムを変更して」に対して、
+    // p値を考慮して「データとしてのありえなさ」を警告したり、総合的な判定を行う。
+    // ここではシンプルに「推定設定」は事後確率最大のものとし、p値が低い場合は警告を出すUIにする。
+
     const bestSetting = results.reduce((prev, current) =>
         (prev.probability > current.probability) ? prev : current
     );
+
+    // p値が低い（例: 5%未満）場合は「信頼度が低い」などのメッセージを出す
+    const isReliable = bestSetting.pValue >= 5;
 
     return (
         <div className="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700 mt-6 animate-fade-in">
@@ -42,7 +49,22 @@ const AnalyzerResult: React.FC<AnalyzerResultProps> = ({ results, machine, input
                 <div className="text-5xl font-bold text-juggler-neonYellow drop-shadow-[0_0_10px_rgba(255,255,0,0.5)]">
                     設定 {bestSetting.setting}
                 </div>
-                <p className="text-sm text-gray-500 mt-1">信頼度: {bestSetting.probability.toFixed(1)}%</p>
+                <div className="mt-2 flex justify-center gap-4 text-sm">
+                    <span className="text-gray-300">
+                        期待度: <span className="font-bold text-juggler-neonPink">{bestSetting.probability.toFixed(1)}%</span>
+                    </span>
+                    <span className="text-gray-300">
+                        適合率(p値): <span className={`font-bold ${bestSetting.pValue < 5 ? 'text-red-500' : 'text-cyan-400'}`}>
+                            {bestSetting.pValue.toFixed(2)}%
+                        </span>
+                    </span>
+                </div>
+                {!isReliable && (
+                    <p className="text-xs text-red-400 mt-2">
+                        ※ この設定の理論値から乖離しています (p値 &lt; 5%)。<br />
+                        ヒキ強/ヒキ弱、あるいは別設定の可能性も考慮してください。
+                    </p>
+                )}
             </div>
 
             <div className="h-64 w-full mb-6">
@@ -53,7 +75,13 @@ const AnalyzerResult: React.FC<AnalyzerResultProps> = ({ results, machine, input
                         <Tooltip
                             contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151' }}
                             itemStyle={{ color: '#fff' }}
-                            formatter={(value: any) => [`${value.toFixed(1)}%`, '確率']}
+                            formatter={(value: any, name: string) => {
+                                // データから対応する設定のp値を取得
+                                const settingName = (name === 'prob' || name === 'uv') ?  // ツールチップの挙動による
+                                    'prob' : name;
+                                return [`${value.toFixed(1)}%`, '期待度'];
+                            }}
+                            labelStyle={{ color: '#e5e7eb' }}
                         />
                         <Bar dataKey="prob" radius={[4, 4, 0, 0]}>
                             {chartData.map((entry, index) => (

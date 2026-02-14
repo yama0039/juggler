@@ -11,6 +11,10 @@ interface AnalyzerFormProps {
         bigCount: string;
         regCount: string;
         grapeCount: string;
+        isolatedBig?: string;
+        cherryBig?: string;
+        isolatedReg?: string;
+        cherryReg?: string;
     };
     onInputChange: (field: string, value: string) => void;
 }
@@ -22,10 +26,28 @@ const AnalyzerForm: React.FC<AnalyzerFormProps> = ({
     inputData,
     onInputChange,
 }) => {
+    const [mode, setMode] = React.useState<'basic' | 'detailed'>('basic');
+
     return (
         <div className="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
-            <h3 className="text-xl font-bold mb-4 text-juggler-neonYellow">
-                データ入力
+            <h3 className="text-xl font-bold mb-4 text-juggler-neonYellow flex justify-between items-center">
+                <span>データ入力</span>
+                <div className="flex bg-gray-900 rounded-lg p-1">
+                    <button
+                        onClick={() => setMode('basic')}
+                        className={`px-4 py-1 rounded-md text-sm font-bold transition-colors ${mode === 'basic' ? 'bg-gray-700 text-white' : 'text-gray-500 hover:text-gray-300'
+                            }`}
+                    >
+                        通常
+                    </button>
+                    <button
+                        onClick={() => setMode('detailed')}
+                        className={`px-4 py-1 rounded-md text-sm font-bold transition-colors ${mode === 'detailed' ? 'bg-juggler-neonPink text-white' : 'text-gray-500 hover:text-gray-300'
+                            }`}
+                    >
+                        詳細
+                    </button>
+                </div>
             </h3>
 
             <div className="mb-4">
@@ -43,7 +65,7 @@ const AnalyzerForm: React.FC<AnalyzerFormProps> = ({
                 </select>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
                     <label className="block text-gray-400 mb-2 text-sm">総回転数</label>
                     <input
@@ -64,27 +86,75 @@ const AnalyzerForm: React.FC<AnalyzerFormProps> = ({
                         placeholder="0"
                     />
                 </div>
-                <div>
-                    <label className="block text-gray-400 mb-2 text-sm text-red-400">BIG回数</label>
-                    <input
-                        type="number"
-                        value={inputData.bigCount}
-                        onChange={(e) => onInputChange('bigCount', e.target.value)}
-                        className="w-full bg-gray-900 text-white p-3 rounded border border-gray-700 focus:border-juggler-neonPink focus:outline-none"
-                        placeholder="0"
-                    />
-                </div>
-                <div>
-                    <label className="block text-gray-400 mb-2 text-sm text-green-400">REG回数</label>
-                    <input
-                        type="number"
-                        value={inputData.regCount}
-                        onChange={(e) => onInputChange('regCount', e.target.value)}
-                        className="w-full bg-gray-900 text-white p-3 rounded border border-gray-700 focus:border-juggler-neonPink focus:outline-none"
-                        placeholder="0"
-                    />
-                </div>
             </div>
+
+            {mode === 'basic' ? (
+                <div className="grid grid-cols-2 gap-4 animate-fade-in">
+                    <div>
+                        <label className="block text-gray-400 mb-2 text-sm text-red-500 font-bold">BIG回数</label>
+                        <input
+                            type="number"
+                            value={inputData.bigCount}
+                            onChange={(e) => onInputChange('bigCount', e.target.value)}
+                            className="w-full bg-gray-900 text-white p-3 rounded border border-gray-700 focus:border-red-500 focus:outline-none"
+                            placeholder="0"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-gray-400 mb-2 text-sm text-green-500 font-bold">REG回数</label>
+                        <input
+                            type="number"
+                            value={inputData.regCount}
+                            onChange={(e) => onInputChange('regCount', e.target.value)}
+                            className="w-full bg-gray-900 text-white p-3 rounded border border-gray-700 focus:border-green-500 focus:outline-none"
+                            placeholder="0"
+                        />
+                    </div>
+                </div>
+            ) : (
+                <div className="grid grid-cols-2 gap-4 animate-fade-in">
+                    <div>
+                        <label className="block text-gray-400 mb-2 text-xs text-red-400">単独 BIG</label>
+                        <input
+                            type="number"
+                            value={inputData.isolatedBig || ''}
+                            onChange={(e) => onInputChange('isolatedBig', e.target.value)}
+                            className="w-full bg-gray-900 text-white p-2 rounded border border-gray-700 focus:border-red-500 focus:outline-none text-sm"
+                            placeholder="0"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-gray-400 mb-2 text-xs text-red-400">チェリー BIG</label>
+                        <input
+                            type="number"
+                            value={inputData.cherryBig || ''}
+                            onChange={(e) => onInputChange('cherryBig', e.target.value)}
+                            className="w-full bg-gray-900 text-white p-2 rounded border border-gray-700 focus:border-red-500 focus:outline-none text-sm"
+                            placeholder="0"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-gray-400 mb-2 text-xs text-green-400">単独 REG</label>
+                        <input
+                            type="number"
+                            value={inputData.isolatedReg || ''}
+                            onChange={(e) => onInputChange('isolatedReg', e.target.value)}
+                            className="w-full bg-gray-900 text-white p-2 rounded border border-gray-700 focus:border-green-500 focus:outline-none text-sm"
+                            placeholder="0"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-gray-400 mb-2 text-xs text-green-400">チェリー REG</label>
+                        <input
+                            type="number"
+                            value={inputData.cherryReg || ''}
+                            onChange={(e) => onInputChange('cherryReg', e.target.value)}
+                            className="w-full bg-gray-900 text-white p-2 rounded border border-gray-700 focus:border-green-500 focus:outline-none text-sm"
+                            placeholder="0"
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

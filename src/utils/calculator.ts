@@ -1,85 +1,140 @@
+import { jStat } from 'jstat';
 
-import type { MachineSpec } from '../data/machineSpecs';
+export interface SettingResult {
+    setting: number;
+    probability: number;
+    pValue: number;
+}
 
 interface InputData {
     totalSpins: number;
     bigCount: number;
     regCount: number;
     grapeCount: number;
+    // 詳細判別用（Optional）
+    isolatedBig?: number;
+    cherryBig?: number;
+    isolatedReg?: number;
+    cherryReg?: number;
 }
 
-export interface SettingResult {
-    setting: number;
-    probability: number; // 0-100%
-    likelihood: number; // Raw likelihood value
-}
-
-// 二項分布の確率質量関数 (近似)
-// P(X=k) = nCk * p^k * (1-p)^(n-k)
-// 対数で計算してアンダーフローを防ぐ
-function logBinomialProbability(n: number, k: number, p: number): number {
-    if (p <= 0 || p >= 1) return -Infinity;
-    // nCk の計算は定数項として比較時は無視できるため省略可能だが、
-    // 厳密な尤度比を出すなら必要。今回はスターリング近似などで代用もできるが、
-    // 設定間の比較だけであれば nCk は共通なので無視してよい。
-    // log(L) = k * log(p) + (n - k) * log(1 - p)
-    return k * Math.log(p) + (n - k) * Math.log(1 - p);
-}
-
+/**
+ * ベイズ推定とカイ二乗検定による設定判別ロジック
+ */
 export const calculateSettingLikelihood = (
     machine: MachineSpec,
     data: InputData
 ): SettingResult[] => {
-    const settings = Object.keys(machine.settings).map(Number);
-    const logLikelihoods: { setting: number; val: number }[] = [];
+    const { totalSpins, bigCount, regCount, grapeCount } = data;
 
-    settings.forEach((setting) => {
+    if (totalSpins === 0) {
+        return [];
+    }
+
+    // 詳細モードかどうかを判定
+    const isDetailedMode =
+        (data.isolatedBig !== undefined || data.cherryBig !== undefined ||
+            data.isolatedReg !== undefined || data.cherryReg !== undefined);
+
+    // 各設定の対数尤度とカイ二乗値を計算
+    const logLikelihoods: { [key: number]: number } = {};
+    const chiSquares: { [key: number]: { chi2: number; df: number } } = {};
+
+    Object.keys(machine.settings).map(Number).forEach(setting => {
         const specs = machine.settings[setting];
+        const pGrape = specs.grape ? (1 / specs.grape) : 0;
 
-        // 確率分母から確率へ変換
-        const pBig = 1 / specs.big;
-        const pReg = 1 / specs.reg;
-        const pGrape = specs.grape ? 1 / specs.grape : 0;
+        // --- 確率と観測数の整理 ---
+        let probs: number[] = [];
+        let observed: number[] = [];
 
-        let logLikelihood = 0;
+        if (isDetailedMode && specs.isolatedBig && specs.cherryBig && specs.isolatedReg && specs.cherryReg) {
+            // 詳細モード
+            probs.push(1 / specs.isolatedBig);
+            observed.push(data.isolatedBig || 0);
 
-        // BIG
-        if (data.totalSpins > 0) {
-            logLikelihood += logBinomialProbability(data.totalSpins, data.bigCount, pBig);
+            probs.push(1 / specs.cherryBig);
+            observed.push(data.cherryBig || 0);
+
+            probs.push(1 / specs.isolatedReg);
+            observed.push(data.isolatedReg || 0);
+
+            probs.push(1 / specs.cherryReg);
+            observed.push(data.cherryReg || 0);
+        } else {
+            // 通常モード
+            probs.push(1 / specs.big);
+            observed.push(bigCount);
+
+            probs.push(1 / specs.reg);
+            observed.push(regCount);
         }
 
-        // REG
-        if (data.totalSpins > 0) {
-            logLikelihood += logBinomialProbability(data.totalSpins, data.regCount, pReg);
+        // ブドウは任意入力
+        if (specs.grape && grapeCount > 0) {
+            probs.push(1 / specs.grape);
+            observed.push(grapeCount);
         }
 
-        // Grape (入力がある場合のみ)
-        if (data.grapeCount > 0 && pGrape > 0) {
-            // ブドウ確率は分母ではなく確率(1/x)で与えられているか確認 -> specs.grapeは分母(6.02など)
-            // 1/6.02 として計算
-            // ブドウの試行回数は通常totalSpinsと同一とみなす
-            logLikelihood += logBinomialProbability(data.totalSpins, data.grapeCount, 1 / specs.grape!);
+        // ハズレ (その他)
+        const pTotalEvents = probs.reduce((sum, p) => sum + p, 0);
+        const pMiss = 1 - pTotalEvents;
+
+        // 観測されたハズレ回数
+        const observedTotalEvents = observed.reduce((sum, o) => sum + o, 0);
+        const missCount = totalSpins - observedTotalEvents;
+
+        probs.push(pMiss);
+        observed.push(missCount);
+
+        // --- ベイズ推定 (対数尤度) ---
+        let logL = 0;
+        for (let i = 0; i < probs.length; i++) {
+            // Math.log(0) 回避
+            if (observed[i] > 0) {
+                logL += observed[i] * Math.log(probs[i]);
+            }
+        }
+        logLikelihoods[setting] = logL;
+
+        // --- カイ二乗検定 (適合度検定) ---
+        let chi2 = 0;
+        // 期待度数が0に近いとカイ二乗検定は不安定になるが、ここでは簡易的な指標として計算
+        for (let i = 0; i < probs.length; i++) {
+            const expected = totalSpins * probs[i];
+            if (expected > 0) {
+                chi2 += Math.pow(observed[i] - expected, 2) / expected;
+            }
         }
 
-        logLikelihoods.push({ setting, val: logLikelihood });
+        // 自由度 = カテゴリ数 - 1
+        chiSquares[setting] = { chi2, df: probs.length - 1 };
     });
 
-    // 対数尤度から確率へ (ソフトマックス正規化)
-    // オーバーフロー対策: 最大値を引く
-    const maxLogL = Math.max(...logLikelihoods.map((i) => i.val));
+    // --- 事後確率の計算 (Bayes) ---
+    const maxLogLikelihood = Math.max(...Object.values(logLikelihoods));
+    const likelihoods: { [key: number]: number } = {};
+    let totalLikelihood = 0;
 
-    const likelihoods = logLikelihoods.map((item) => {
+    Object.keys(logLikelihoods).map(Number).forEach(setting => {
+        const l = Math.exp(logLikelihoods[setting] - maxLogLikelihood);
+        likelihoods[setting] = l;
+        totalLikelihood += l;
+    });
+
+    // 結果の生成
+    const results: SettingResult[] = Object.keys(likelihoods).map(Number).map(setting => {
+        const { chi2, df } = chiSquares[setting];
+        // p値の計算 (右側確率) = 1 - CDF
+        // jStat.chisquare.cdf(x, df)
+        const pValue = 1 - jStat.chisquare.cdf(chi2, df);
+
         return {
-            setting: item.setting,
-            expVal: Math.exp(item.val - maxLogL)
+            setting: setting,
+            probability: (likelihoods[setting] / totalLikelihood) * 100,
+            pValue: pValue * 100 // %単位に変換
         };
     });
 
-    const totalLikelihood = likelihoods.reduce((sum, item) => sum + item.expVal, 0);
-
-    return likelihoods.map((item) => ({
-        setting: item.setting,
-        probability: (item.expVal / totalLikelihood) * 100,
-        likelihood: item.expVal
-    })).sort((a, b) => b.setting - a.setting); // 設定6から順に表示したいため降順ソートなどお好みで。今回は一旦そのまま。
+    return results.sort((a, b) => a.setting - b.setting);
 };

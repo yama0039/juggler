@@ -1,5 +1,6 @@
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import AnalyzerForm from '../components/Analyzer/AnalyzerForm';
 import AnalyzerResult from '../components/Analyzer/AnalyzerResult';
 import { machineSpecs } from '../data/machineSpecs';
@@ -8,12 +9,48 @@ import { calculateSettingLikelihood } from '../utils/calculator';
 
 const AnalyzerPage = () => {
     const [selectedMachineId, setSelectedMachineId] = useState<string>(machineSpecs[0].id);
-    const [inputData, setInputData] = useState({
+    const location = useLocation();
+
+    const [inputData, setInputData] = useState<{
+        totalSpins: string;
+        bigCount: string;
+        regCount: string;
+        grapeCount: string;
+        isolatedBig?: string;
+        cherryBig?: string;
+        isolatedReg?: string;
+        cherryReg?: string;
+    }>({
         totalSpins: '',
         bigCount: '',
         regCount: '',
         grapeCount: '',
+        isolatedBig: '',
+        cherryBig: '',
+        isolatedReg: '',
+        cherryReg: '',
     });
+
+    useEffect(() => {
+        if (location.state?.counterData) {
+            const data = location.state.counterData;
+            const currentGames = Math.max(0, data.TotalGame - data.StartGame);
+
+            setInputData({
+                totalSpins: currentGames.toString(),
+                bigCount: (data.IsolatedBig + data.CherryBig).toString(),
+                regCount: (data.IsolatedReg + data.CherryReg).toString(),
+                grapeCount: data.Grape.toString(),
+                isolatedBig: data.IsolatedBig.toString(),
+                cherryBig: data.CherryBig.toString(),
+                isolatedReg: data.IsolatedReg.toString(),
+                cherryReg: data.CherryReg.toString(),
+            });
+
+            // Clear state to avoid overwriting on re-renders (optional, but good practice)
+            window.history.replaceState({}, document.title);
+        }
+    }, [location.state]);
 
     const handleInputChange = (field: string, value: string) => {
         setInputData((prev) => ({ ...prev, [field]: value }));
@@ -32,6 +69,10 @@ const AnalyzerPage = () => {
             bigCount: parseInt(inputData.bigCount) || 0,
             regCount: parseInt(inputData.regCount) || 0,
             grapeCount: parseInt(inputData.grapeCount) || 0,
+            isolatedBig: inputData.isolatedBig ? parseInt(inputData.isolatedBig) : undefined,
+            cherryBig: inputData.cherryBig ? parseInt(inputData.cherryBig) : undefined,
+            isolatedReg: inputData.isolatedReg ? parseInt(inputData.isolatedReg) : undefined,
+            cherryReg: inputData.cherryReg ? parseInt(inputData.cherryReg) : undefined,
         };
 
         return calculateSettingLikelihood(selectedMachine, data);

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CircleCounter from '../components/Counter/CircleCounter';
-import { RotateCcw, Save } from 'lucide-react';
+import { RotateCcw, Save, BarChart2 } from 'lucide-react';
 
 const CounterPage = () => {
     const navigate = useNavigate();
@@ -89,6 +89,17 @@ const CounterPage = () => {
                         <Save size={20} />
                     </button>
                     <button
+                        onClick={() => {
+                            if (window.confirm('現在のカウントデータで設定判別を行いますか？')) {
+                                navigate('/analyzer', { state: { counterData: counts } });
+                            }
+                        }}
+                        className="p-2 text-juggler-neonPink hover:text-pink-400 rounded-full hover:bg-gray-800 transition"
+                        title="設定判別"
+                    >
+                        <BarChart2 size={20} />
+                    </button>
+                    <button
                         onClick={reset}
                         className="p-2 text-gray-400 hover:text-red-400 rounded-full hover:bg-gray-800 transition"
                         title="リセット"
@@ -127,8 +138,8 @@ const CounterPage = () => {
                 </div>
             </div>
 
-            {/* Fixed Grid for better layout control */}
-            <div className="grid grid-cols-2 gap-x-4 gap-y-8 justify-items-center">
+            {/* Centered Grid with optimized spacing for smaller buttons */}
+            <div className="grid grid-cols-2 gap-x-10 gap-y-2 w-fit mx-auto">
                 <CircleCounter
                     label="単独 BIG"
                     count={counts.IsolatedBig}
