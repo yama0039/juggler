@@ -143,6 +143,14 @@ const LoginPage = () => {
                             : 'すでにアカウントをお持ちの方はこちら（ログイン）'}
                     </button>
                 </div>
+
+                {/* Debug Info */}
+                <div className="mt-4 p-4 bg-gray-900 rounded text-xs text-gray-400 break-all">
+                    <p className="font-bold mb-1">Debug Info:</p>
+                    <p>Current Origin: {window.location.origin}</p>
+                    <p>Current Path: {window.location.pathname}</p>
+                    <p>Redirect URL to be sent: {`${window.location.origin}${window.location.pathname}`}</p>
+                </div>
             </div>
         </div>
     );
