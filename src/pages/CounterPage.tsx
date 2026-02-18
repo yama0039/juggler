@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import clsx from 'clsx';
 import CircleCounter from '../components/Counter/CircleCounter';
 import { RotateCcw, Save, BarChart2, ChevronDown, Table as TableIcon, Info } from 'lucide-react';
 import { machineSpecs, type JugglerModel } from '../data/machineSpecs';
@@ -33,6 +34,10 @@ const CounterPage = () => {
     const [selectedMachineId, setSelectedMachineId] = useState<JugglerModel>(() => {
         return (localStorage.getItem('juggler_selected_machine') as JugglerModel) || 'my-juggler-v';
     });
+
+    // Display modes for table
+    const [bigDisplayMode, setBigDisplayMode] = useState<'total' | 'isolated' | 'cherry'>('total');
+    const [regDisplayMode, setRegDisplayMode] = useState<'total' | 'isolated' | 'cherry'>('total');
 
     const selectedMachine = useMemo(() =>
         machineSpecs.find(m => m.id === selectedMachineId) || machineSpecs[0]
@@ -93,6 +98,20 @@ const CounterPage = () => {
 
     const calcProb = (count: number) => {
         return count > 0 ? (currentGames / count).toFixed(1) : '-';
+    };
+
+    const toggleBigMode = () => {
+        setBigDisplayMode(prev => prev === 'total' ? 'isolated' : prev === 'isolated' ? 'cherry' : 'total');
+    };
+
+    const toggleRegMode = () => {
+        setRegDisplayMode(prev => prev === 'total' ? 'isolated' : prev === 'isolated' ? 'cherry' : 'total');
+    };
+
+    const getModeLabel = (mode: string, base: string) => {
+        if (mode === 'isolated') return `単独 ${base}`;
+        if (mode === 'cherry') return `チェリー ${base}`;
+        return `${base} 合算`;
     };
 
     return (
@@ -254,27 +273,63 @@ const CounterPage = () => {
 
                 <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden shadow-2xl">
                     <div className="overflow-x-auto">
-                        <table className="w-full text-xs text-center">
+                        <table className="w-full text-[10px] sm:text-xs text-center border-collapse">
                             <thead>
                                 <tr className="bg-gray-900 text-gray-400 uppercase font-black tracking-tighter border-b border-gray-700">
-                                    <th className="px-2 py-3 border-r border-gray-800">設定</th>
-                                    <th className="px-2 py-3 text-red-500">BIG合算</th>
-                                    <th className="px-2 py-3 text-blue-500">REG合算</th>
-                                    <th className="px-2 py-3 text-juggler-neonYellow">合算</th>
-                                    <th className="px-2 py-3 text-green-500">ぶどう</th>
+                                    <th className="px-1 py-3 border-r border-gray-800 w-12">設定</th>
+                                    <th
+                                        className="px-1 py-3 text-red-500 cursor-pointer hover:bg-red-500/10 transition-colors select-none"
+                                        onClick={toggleBigMode}
+                                    >
+                                        <div className="flex items-center justify-center gap-1">
+                                            {getModeLabel(bigDisplayMode, 'BIG')}
+                                            <ChevronDown size={10} className={clsx("transition-transform", bigDisplayMode !== 'total' && "rotate-180")} />
+                                        </div>
+                                    </th>
+                                    <th
+                                        className="px-1 py-3 text-blue-500 cursor-pointer hover:bg-blue-500/10 transition-colors select-none"
+                                        onClick={toggleRegMode}
+                                    >
+                                        <div className="flex items-center justify-center gap-1">
+                                            {getModeLabel(regDisplayMode, 'REG')}
+                                            <ChevronDown size={10} className={clsx("transition-transform", regDisplayMode !== 'total' && "rotate-180")} />
+                                        </div>
+                                    </th>
+                                    <th className="px-1 py-3 text-juggler-neonYellow">合算</th>
+                                    <th className="px-1 py-3 text-green-500">ぶどう</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {[1, 2, 3, 4, 5, 6].map(setting => {
                                     const s = selectedMachine.settings[setting];
                                     const totalBonusProb = 1 / ((1 / s.big) + (1 / s.reg));
+
+                                    const getVal = (mode: string, spec: any, type: 'big' | 'reg') => {
+                                        if (mode === 'isolated') return type === 'big' ? spec.isolatedBig : spec.isolatedReg;
+                                        if (mode === 'cherry') return type === 'big' ? spec.cherryBig : spec.cherryReg;
+                                        return type === 'big' ? spec.big : spec.reg;
+                                    };
+
+                                    const bVal = getVal(bigDisplayMode, s, 'big');
+                                    const rVal = getVal(regDisplayMode, s, 'reg');
+
                                     return (
                                         <tr key={setting} className="border-b border-gray-700/50 last:border-0 hover:bg-gray-750 transition-colors">
-                                            <td className="px-2 py-3 font-black bg-gray-900/30 border-r border-gray-700/50 text-white italic">設定{setting}</td>
-                                            <td className="px-2 py-3 font-mono text-gray-300">1/{s.big.toFixed(1)}</td>
-                                            <td className="px-2 py-3 font-mono text-gray-300 font-bold">1/{s.reg.toFixed(1)}</td>
-                                            <td className="px-2 py-3 font-mono text-white font-black">1/{totalBonusProb.toFixed(1)}</td>
-                                            <td className="px-2 py-3 font-mono text-gray-300">1/{(s.grape || 0).toFixed(3)}</td>
+                                            <td className="px-1 py-3 font-black bg-gray-900/30 border-r border-gray-700/50 text-white italic">#{setting}</td>
+                                            <td className={clsx(
+                                                "px-1 py-3 font-mono",
+                                                bigDisplayMode === 'total' ? "text-gray-300" : "text-red-400 font-bold"
+                                            )}>
+                                                1/{bVal?.toFixed(1) || '-'}
+                                            </td>
+                                            <td className={clsx(
+                                                "px-1 py-3 font-mono",
+                                                regDisplayMode === 'total' ? "text-gray-300 font-bold" : "text-blue-400 font-bold"
+                                            )}>
+                                                1/{rVal?.toFixed(1) || '-'}
+                                            </td>
+                                            <td className="px-1 py-3 font-mono text-white font-black">1/{totalBonusProb.toFixed(1)}</td>
+                                            <td className="px-1 py-3 font-mono text-gray-300">1/{(s.grape || 0).toFixed(3)}</td>
                                         </tr>
                                     );
                                 })}
@@ -286,8 +341,7 @@ const CounterPage = () => {
                 <div className="mt-4 p-4 bg-gray-900/50 rounded-lg border border-gray-800 flex items-start gap-3">
                     <Info size={16} className="text-gray-500 mt-0.5" />
                     <p className="text-[10px] text-gray-500 leading-relaxed font-bold">
-                        ※上記確率はけんのスロット独自解析値に基づくものです。<br />
-                        単独/チェリー重複などのより詳細な設定差は「設定判別」ボタンから確認・判別できます。
+                        ※ヘッダー（BIG合算/REG合算）をタップすると、<span className="text-white">合算 ➔ 単独 ➔ チェリー重複</span> の順に表示を切り替えられます。
                     </p>
                 </div>
             </div>
