@@ -37,17 +37,17 @@ const HistoryPage = () => {
 
     return (
         <div className="max-w-3xl mx-auto pb-12 px-4 sm:px-0">
-            <h2 className="text-2xl font-bold mb-6 flex items-center justify-between">
-                <div className="flex items-center">
+            <div className="flex flex-col mb-6">
+                <h2 className="text-2xl font-bold flex items-center mb-4">
                     <span className="w-2 h-8 bg-juggler-neonPink mr-3 rounded-full"></span>
                     履歴・収支
-                </div>
+                </h2>
 
                 <div className="flex items-center text-sm font-normal">
                     <select
                         value={selectedModel}
                         onChange={(e) => setSelectedModel(e.target.value)}
-                        className="bg-gray-800 border border-gray-700 text-white rounded px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-juggler-neonPink"
+                        className="bg-gray-800 border border-gray-700 text-white rounded px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-juggler-neonPink w-full sm:w-auto"
                     >
                         <option value="all">すべての機種</option>
                         {machineSpecs.map(spec => (
@@ -55,15 +55,20 @@ const HistoryPage = () => {
                         ))}
                     </select>
                 </div>
-            </h2>
+            </div>
 
             {loading && <div className="text-center text-gray-400 py-8">読み込み中...</div>}
             {error && <div className="bg-red-900 text-red-200 p-4 rounded mb-4">{error}</div>}
 
             {!loading && !error && (
                 <>
-                    <HistorySummary records={filteredRecords} />
+                    {/* 収支推移を最上部に配置 */}
                     {filteredRecords.length > 0 && <HistoryChart records={filteredRecords} />}
+
+                    {/* コンパクトになった合計統計 */}
+                    <HistorySummary records={filteredRecords} />
+
+                    {/* 履歴リスト */}
                     <HistoryList records={filteredRecords} onDelete={handleDelete} />
                 </>
             )}

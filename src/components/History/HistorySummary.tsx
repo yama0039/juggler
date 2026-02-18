@@ -25,34 +25,34 @@ const HistorySummary: React.FC<HistorySummaryProps> = ({ records }) => {
     const regProb = stats.totalReg > 0 ? (stats.totalSpins / stats.totalReg).toFixed(1) : '-';
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-            <div className="bg-gray-800 p-4 rounded-lg border border-gray-700 shadow-sm flex flex-col justify-center">
-                <p className="text-gray-400 text-xs mb-1 flex items-center">
-                    <Disc size={12} className="mr-1 text-blue-400" />
-                    総回転数
+        <div className="grid grid-cols-3 gap-2 mb-4">
+            <div className="bg-gray-800 p-2 sm:p-3 rounded-lg border border-gray-700 shadow-sm flex flex-col justify-center">
+                <p className="text-gray-400 text-[10px] sm:text-xs mb-0.5 flex items-center">
+                    <Disc size={10} className="mr-1 text-blue-400" />
+                    回転
                 </p>
-                <p className="text-2xl font-bold font-mono text-white">
-                    {stats.totalSpins.toLocaleString()} <span className="text-sm font-normal text-gray-500">G</span>
+                <p className="text-lg sm:text-xl font-bold font-mono text-white leading-tight">
+                    {stats.totalSpins.toLocaleString()}<span className="text-[10px] font-normal text-gray-500 ml-0.5">G</span>
                 </p>
             </div>
-            <div className="bg-gray-800 p-4 rounded-lg border border-gray-700 shadow-sm">
-                <p className="text-gray-400 text-xs mb-1">
+            <div className="bg-gray-800 p-2 sm:p-3 rounded-lg border border-gray-700 shadow-sm">
+                <p className="text-gray-400 text-[10px] sm:text-xs mb-0.5">
                     <span className="text-red-400 font-bold mr-1">BB</span>
-                    総回数 / 確率
+                    回数 / 確率
                 </p>
-                <div className="flex items-baseline gap-2">
-                    <p className="text-2xl font-bold font-mono text-white">{stats.totalBig}</p>
-                    <p className="text-sm font-mono text-gray-400">1/{bigProb}</p>
+                <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-1.5">
+                    <p className="text-lg sm:text-xl font-bold font-mono text-white leading-tight">{stats.totalBig}</p>
+                    <p className="text-[10px] sm:text-xs font-mono text-gray-500">1/{bigProb}</p>
                 </div>
             </div>
-            <div className="bg-gray-800 p-4 rounded-lg border border-gray-700 shadow-sm">
-                <p className="text-gray-400 text-xs mb-1">
+            <div className="bg-gray-800 p-2 sm:p-3 rounded-lg border border-gray-700 shadow-sm">
+                <p className="text-gray-400 text-[10px] sm:text-xs mb-0.5">
                     <span className="text-green-400 font-bold mr-1">RB</span>
-                    総回数 / 確率
+                    回数 / 確率
                 </p>
-                <div className="flex items-baseline gap-2">
-                    <p className="text-2xl font-bold font-mono text-white">{stats.totalReg}</p>
-                    <p className="text-sm font-mono text-gray-400">1/{regProb}</p>
+                <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-1.5">
+                    <p className="text-lg sm:text-xl font-bold font-mono text-white leading-tight">{stats.totalReg}</p>
+                    <p className="text-[10px] sm:text-xs font-mono text-gray-500">1/{regProb}</p>
                 </div>
             </div>
         </div>
