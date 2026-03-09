@@ -1,5 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
+import { vibrate } from '../../utils/haptics';
 
 interface CircleCounterProps {
     label: string;
@@ -11,6 +12,10 @@ interface CircleCounterProps {
 }
 
 const CircleCounter: React.FC<CircleCounterProps> = ({ label, count, totalSpins, color, onClick, onDecrement }) => {
+    const handleButtonClick = () => {
+        vibrate(30); // 30ms short vibration
+        onClick();
+    };
     // Probability calculation
     const probability = count > 0 ? (totalSpins / count).toFixed(2) : '-';
 
@@ -86,7 +91,7 @@ const CircleCounter: React.FC<CircleCounterProps> = ({ label, count, totalSpins,
     return (
         <div className="flex flex-col items-center justify-center p-2">
             <button
-                onClick={onClick}
+                onClick={handleButtonClick}
                 className={clsx(
                     "relative w-28 h-28 rounded-full flex items-center justify-center transition-all duration-150 transform active:scale-95",
                     "bg-gray-900 border-2",
