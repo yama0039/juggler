@@ -17,6 +17,9 @@ export interface Probability {
 export interface MachineSpec {
     id: JugglerModel;
     name: string;
+    bigPayout: number;
+    regPayout: number;
+    backcalcCherry: number; // 逆算用チェリー確率 (チェリー狙い時)
     settings: {
         [key: number]: Probability;
     };
@@ -26,6 +29,9 @@ export const machineSpecs: MachineSpec[] = [
     {
         id: 'im_ex',
         name: 'SアイムジャグラーEX',
+        bigPayout: 252,
+        regPayout: 96,
+        backcalcCherry: 35.617,
         settings: {
             1: { big: 273.0667, reg: 439.8389, grape: 6.0240, payout: 97.9, isolatedBig: 387.7870, cherryBig: 923.0423, isolatedReg: 636.2718, cherryReg: 1424.6956, cherry: 35.2400 },
             2: { big: 269.6955, reg: 399.6098, grape: 6.0240, payout: 99.0, isolatedBig: 381.0233, cherryBig: 923.0423, isolatedReg: 569.8783, cherryReg: 1337.4694, cherry: 35.2400 },
@@ -38,6 +44,9 @@ export const machineSpecs: MachineSpec[] = [
     {
         id: 'my_v',
         name: 'マイジャグラーⅤ',
+        bigPayout: 240,
+        regPayout: 96,
+        backcalcCherry: 34.657,
         settings: {
             1: { big: 273.1000, reg: 409.6000, grape: 5.9100, payout: 98.1, isolatedBig: 420.1030, cherryBig: 1365.333, isolatedReg: 655.3600, cherryReg: 1092.2670, cherry: 38.1000 },
             2: { big: 270.8000, reg: 385.5000, grape: 5.8700, payout: 99.3, isolatedBig: 414.7850, cherryBig: 1365.333, isolatedReg: 595.7820, cherryReg: 1092.2670, cherry: 38.1000 },
@@ -50,6 +59,9 @@ export const machineSpecs: MachineSpec[] = [
     {
         id: 'funky_2',
         name: 'ファンキージャグラー2',
+        bigPayout: 240,
+        regPayout: 96,
+        backcalcCherry: 35.617,
         settings: {
             1: { big: 266.4000, reg: 439.8000, grape: 5.9400, payout: 98.2, isolatedBig: 404.5000, cherryBig: 1425.0000, isolatedReg: 630.2000, cherryReg: 1456.4000, cherry: 35.4700 },
             2: { big: 259.0000, reg: 407.1000, grape: 5.9300, payout: 99.5, isolatedBig: 397.2000, cherryBig: 1365.0000, isolatedReg: 585.1000, cherryReg: 1337.5000, cherry: 35.4700 },
@@ -62,6 +74,9 @@ export const machineSpecs: MachineSpec[] = [
     {
         id: 'happy_v3',
         name: 'ハッピージャグラーV Ⅲ',
+        bigPayout: 240,
+        regPayout: 96,
+        backcalcCherry: 56.55,
         settings: {
             1: { big: 273.0667, reg: 397.1879, grape: 6.0402, payout: 98.0, isolatedBig: 358.1202, cherryBig: 1149.7544, isolatedReg: 682.6667, cherryReg: 949.7971, cherry: 35.2400 },
             2: { big: 270.8099, reg: 362.0774, grape: 6.0103, payout: 99.2, isolatedBig: 354.2486, cherryBig: 1149.7544, isolatedReg: 612.4860, cherryReg: 885.6216, cherry: 35.2400 },
@@ -74,6 +89,9 @@ export const machineSpecs: MachineSpec[] = [
     {
         id: 'gogo_3',
         name: 'ゴーゴージャグラー3',
+        bigPayout: 240,
+        regPayout: 96,
+        backcalcCherry: 33.2,
         settings: {
             1: { big: 259.0360, reg: 354.2490, grape: 6.2499, payout: 98.2, isolatedBig: 346.7510, cherryBig: 1024.0000, isolatedReg: 471.4820, cherryReg: 1424.6960, cherry: 35.3666 },
             2: { big: 258.0160, reg: 332.6700, grape: 6.2002, payout: 99.5, isolatedBig: 344.9260, cherryBig: 1024.0000, isolatedReg: 448.8770, cherryReg: 1285.0200, cherry: 35.3666 },
@@ -86,6 +104,9 @@ export const machineSpecs: MachineSpec[] = [
     {
         id: 'girls_ss',
         name: 'ジャグラーガールズSS',
+        bigPayout: 240,
+        regPayout: 96,
+        backcalcCherry: 33.301,
         settings: {
             1: { big: 273.0667, reg: 381.0233, grape: 6.0100, payout: 98.0, isolatedBig: 387.7870, cherryBig: 923.0420, isolatedReg: 520.1270, cherryReg: 1424.6960, cherry: 35.7200 },
             2: { big: 270.8099, reg: 350.4599, grape: 6.0100, payout: 99.2, isolatedBig: 381.0230, cherryBig: 936.2290, isolatedReg: 481.8820, cherryReg: 1285.0200, cherry: 35.7200 },
@@ -98,6 +119,9 @@ export const machineSpecs: MachineSpec[] = [
     {
         id: 'mr_j',
         name: 'ミスタージャグラー',
+        bigPayout: 240,
+        regPayout: 96,
+        backcalcCherry: 39.0,
         settings: {
             1: { big: 268.5900, reg: 374.4910, grape: 6.2178, payout: 98.0, isolatedBig: 348.5957, cherryBig: 1170.2857, isolatedReg: 512.0000, cherryReg: 1394.3830, cherry: 38.5506 },
             2: { big: 267.4940, reg: 354.2490, grape: 6.1640, payout: 99.2, isolatedBig: 348.5957, cherryBig: 1149.7544, isolatedReg: 478.3650, cherryReg: 1365.3333, cherry: 38.5506 },
@@ -110,6 +134,9 @@ export const machineSpecs: MachineSpec[] = [
     {
         id: 'ultra_miracle',
         name: 'ウルトラミラクルジャグラー',
+        bigPayout: 240,
+        regPayout: 96,
+        backcalcCherry: 34.86,
         settings: {
             1: { big: 267.4900, reg: 425.5600, grape: 5.9400, payout: 98.1, isolatedBig: 334.3673, cherryBig: 1337.4694, isolatedReg: 595.7818, cherryReg: 1489.4545, cherry: 35.54 },
             2: { big: 261.1000, reg: 402.0600, grape: 5.9380, payout: 99.4, isolatedBig: 332.6701, cherryBig: 1213.6296, isolatedReg: 546.1333, cherryReg: 1524.0930, cherry: 35.54 },
@@ -122,6 +149,9 @@ export const machineSpecs: MachineSpec[] = [
     {
         id: 'neo_im',
         name: 'ネオアイムジャグラーEX',
+        bigPayout: 252,
+        regPayout: 96,
+        backcalcCherry: 35.617,
         settings: {
             1: { big: 273.0667, reg: 439.8389, grape: 6.0240, payout: 97.9, isolatedBig: 387.7870, cherryBig: 923.0423, isolatedReg: 636.2718, cherryReg: 1424.6956, cherry: 35.2400 },
             2: { big: 269.6955, reg: 399.6098, grape: 6.0240, payout: 99.0, isolatedBig: 381.0233, cherryBig: 923.0423, isolatedReg: 569.8783, cherryReg: 1337.4694, cherry: 35.2400 },

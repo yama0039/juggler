@@ -26,7 +26,8 @@ const CounterPage = () => {
             CherryBig: 0,
             CherryReg: 0,
             Grape: 0,
-            NonOverlappingCherry: 0
+            NonOverlappingCherry: 0,
+            DifferenceInCoins: 0
         };
     });
 
@@ -80,7 +81,8 @@ const CounterPage = () => {
                 CherryBig: 0,
                 CherryReg: 0,
                 Grape: 0,
-                NonOverlappingCherry: 0
+                NonOverlappingCherry: 0,
+                DifferenceInCoins: 0
             });
         }
     };
@@ -112,6 +114,38 @@ const CounterPage = () => {
         if (mode === 'isolated') return `単独 ${base}`;
         if (mode === 'cherry') return `チェリー ${base}`;
         return `${base} 合算`;
+    };
+
+    // Grape Back-calculation Logic
+    const estimatedGrape = useMemo(() => {
+        if (!selectedMachine || currentGames === 0) return 0;
+
+        const { bigPayout, regPayout, backcalcCherry } = selectedMachine;
+        const replayProb = 1 / 7.298;
+
+        // Theoretical Payout (excluding Grapes)
+        // 1. Bonus
+        const bonusPayout = (totalBig * bigPayout) + (totalReg * regPayout);
+        // 2. Replay (3 coins payout per approx 7.3 games)
+        const replayPayout = (currentGames * replayProb) * 3;
+        // 3. Cherry (2 coins payout per backcalcCherry games)
+        const cherryPayout = (currentGames / backcalcCherry) * 2;
+
+        const theoreticalPayoutOtherThanGrape = bonusPayout + replayPayout + cherryPayout;
+
+        // Expected total coins spent = currentGames * 3
+        // coinsRemaining = expectedTotalSpent + Diff
+        // grapeCoins = (coinsRemaining - theoreticalPayoutOtherThanGrape)
+        // grapeCount = grapeCoins / 8
+
+        const estimatedCount = (counts.DifferenceInCoins + currentGames * 3 - theoreticalPayoutOtherThanGrape) / 8;
+        return Math.max(0, Math.round(estimatedCount));
+    }, [counts.DifferenceInCoins, currentGames, totalBig, totalReg, selectedMachine]);
+
+    const handleApplyEstimatedGrape = () => {
+        if (estimatedGrape > 0 && window.confirm(`逆算されたブドウ回数 ${estimatedGrape} 回をカウンターに反映しますか？`)) {
+            setCounts((prev: any) => ({ ...prev, Grape: estimatedGrape }));
+        }
     };
 
     return (
@@ -181,6 +215,31 @@ const CounterPage = () => {
                         onChange={(e) => setCounts((prev: any) => ({ ...prev, TotalGame: parseInt(e.target.value) || 0 }))}
                         onClick={(e) => (e.target as HTMLInputElement).select()}
                     />
+                </div>
+                <div>
+                    <label className="block text-[10px] text-gray-500 mb-1 text-center font-black uppercase tracking-tighter">差枚数</label>
+                    <input
+                        type="number"
+                        className="w-full bg-gray-900 text-center text-xl font-mono font-bold text-juggler-neonGreen rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-juggler-neonGreen border border-gray-700"
+                        value={counts.DifferenceInCoins}
+                        onChange={(e) => setCounts((prev: any) => ({ ...prev, DifferenceInCoins: parseInt(e.target.value) || 0 }))}
+                        onClick={(e) => (e.target as HTMLInputElement).select()}
+                    />
+                </div>
+                <div className="flex flex-col justify-end">
+                    <button
+                        onClick={handleApplyEstimatedGrape}
+                        disabled={estimatedGrape === 0}
+                        className={clsx(
+                            "w-full h-[54px] rounded-lg border font-bold text-xs transition-all flex flex-col items-center justify-center gap-0.5",
+                            estimatedGrape > 0
+                                ? "bg-green-500/10 border-green-500/50 text-green-400 hover:bg-green-500/20 active:scale-95"
+                                : "bg-gray-800 border-gray-700 text-gray-600 cursor-not-allowed"
+                        )}
+                    >
+                        <span>ブドウ逆算反映</span>
+                        <span className="text-sm font-mono text-white">{estimatedGrape > 0 ? `${estimatedGrape} 回` : '-'}</span>
+                    </button>
                 </div>
                 <div className="col-span-2 text-center border-t border-gray-700 pt-3 mt-1">
                     <span className="text-xs text-gray-500 mr-2 font-bold uppercase tracking-widest">区間ゲーム数</span>
