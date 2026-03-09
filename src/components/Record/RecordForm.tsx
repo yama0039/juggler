@@ -3,8 +3,9 @@ import React, { useState } from 'react';
 import { machineSpecs } from '../../data/machineSpecs';
 import type { JugglerRecord } from '../../types';
 import HallSelect from './HallSelect';
-import { Save } from 'lucide-react';
+import { Save, Calculator } from 'lucide-react';
 import clsx from 'clsx';
+import { backCalculateGrapes } from '../../utils/calculator';
 
 interface RecordFormProps {
     onSubmit: (data: Omit<JugglerRecord, 'id' | 'created_at' | 'user_id'>) => Promise<boolean>;
@@ -18,6 +19,7 @@ interface RecordFormProps {
         CherryReg: number;
         Grape: number;
         NonOverlappingCherry: number;
+        DifferenceInCoins?: number;
     };
 }
 
@@ -37,10 +39,24 @@ const RecordForm: React.FC<RecordFormProps> = ({ onSubmit, loading, initialData 
         cherry_reg: initialData?.CherryReg.toString() || '',
         grape: initialData?.Grape.toString() || '',
         non_overlapping_cherry: initialData?.NonOverlappingCherry.toString() || '',
+        diff_coins: initialData?.DifferenceInCoins?.toString() || '',
         investment: '',
         recovery: '',
         memo: '',
     });
+
+    const handleBackCalc = () => {
+        const spins = parseInt(formData.total_spins) || 0;
+        const big = (parseInt(formData.isolated_big) || 0) + (parseInt(formData.cherry_big) || 0);
+        const reg = (parseInt(formData.isolated_reg) || 0) + (parseInt(formData.cherry_reg) || 0);
+        const diff = parseInt(formData.diff_coins) || 0;
+        const machine = machineSpecs.find(m => m.id === formData.machine_type) || machineSpecs[0];
+
+        if (spins > 0) {
+            const calculated = backCalculateGrapes(machine, spins, big, reg, diff);
+            setFormData(prev => ({ ...prev, grape: calculated.toString() }));
+        }
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -82,6 +98,7 @@ const RecordForm: React.FC<RecordFormProps> = ({ onSubmit, loading, initialData 
                 cherry_reg: '',
                 grape: '',
                 non_overlapping_cherry: '',
+                diff_coins: '',
                 investment: '',
                 recovery: '',
                 memo: '',
@@ -133,9 +150,30 @@ const RecordForm: React.FC<RecordFormProps> = ({ onSubmit, loading, initialData 
             <div className="border-t border-gray-700 pt-4">
                 <h4 className="text-lg font-semibold text-white mb-3">カウンター詳細</h4>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div className="col-span-2 md:col-span-1">
+                    <div>
                         <label className={labelClass}>総回転数</label>
                         <input type="number" name="total_spins" value={formData.total_spins} onChange={handleChange} className={inputClass} required placeholder="0" />
+                    </div>
+                    <div>
+                        <label className={clsx(labelClass, "text-juggler-neonGreen")}>差枚数 (逆算用)</label>
+                        <div className="relative">
+                            <input
+                                type="number"
+                                name="diff_coins"
+                                value={formData.diff_coins}
+                                onChange={handleChange}
+                                className={clsx(inputClass, "pr-10")}
+                                placeholder="±0"
+                            />
+                            <button
+                                type="button"
+                                onClick={handleBackCalc}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 text-juggler-neonGreen hover:text-white transition-colors"
+                                title="ブドウ逆算"
+                            >
+                                <Calculator size={18} />
+                            </button>
+                        </div>
                     </div>
                     <div>
                         <label className={clsx(labelClass, "text-red-400")}>単独BIG</label>

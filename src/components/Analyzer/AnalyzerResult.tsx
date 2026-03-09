@@ -138,7 +138,7 @@ const AnalyzerResult: React.FC<AnalyzerResultProps> = ({
                             <td className="px-3 py-3">-</td>
                             <td className="px-3 py-3 font-bold">
                                 {inputData.totalSpins > 0 ? (
-                                    ((inputData.bigCount * 240 + inputData.regCount * 96 + (inputData.grapeCount || 0) * 8) / (inputData.totalSpins * 3) * 100).toFixed(1)
+                                    ((inputData.bigCount * machine.bigPayout + inputData.regCount * machine.regPayout + (inputData.grapeCount || 0) * 8) / (inputData.totalSpins * 3) * 100).toFixed(1)
                                 ) : '-'}%
                             </td>
                             <td className="px-3 py-3">

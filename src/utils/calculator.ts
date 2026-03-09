@@ -196,34 +196,27 @@ export const backCalculateGrapes = (
     regCount: number,
     diffCoins: number
 ): number => {
+    const { bigPayout, regPayout, backcalcCherry } = machine;
+    const replayProb = 1 / 7.298;
+
     // 投入枚数 = 総回転数 * 3
     const totalIn = totalSpins * 3;
     // 総払い出し = 投入枚数 + 差枚数
     const totalOut = totalIn + diffCoins;
 
-    // ボーナスによる払い出し (6号機ジャグラーの標準値)
-    // アイム/マイV/ファンキー2等: BIG 240枚, REG 96枚
-    let bonusOut = 0;
-    if (machine.id === 'happy_v3') {
-        bonusOut = bigCount * 240 + regCount * 96; // ハッピーも同様だが、機種によって微調整が必要な場合あり
-    } else {
-        bonusOut = bigCount * 240 + regCount * 96;
-    }
+    // ボーナスによる払い出し
+    const bonusOut = (bigCount * bigPayout) + (regCount * regPayout);
 
-    // チェリーによる払い出し (簡易計算: 1/35で2枚)
-    const cherryCount = Math.round(totalSpins / 35);
-    const cherryOut = cherryCount * 2;
+    // チェリーによる払い出し (逆算用チェリー確率を使用)
+    const cherryOut = (totalSpins / backcalcCherry) * 2;
 
-    // 残りがブドウとリプレイ
-    // リプレイは 1/7.3 で3枚払い出し(投入を相殺するので実質0だが、totalOutには含まれる)
-    // totalOut = リプレイ(3) + ブドウ(8) + チェリー(2) + ボーナス
-    // リプレイ回数 = totalSpins / 7.3
-    const replayCount = Math.round(totalSpins / 7.3);
-    const replayOut = replayCount * 3;
+    // リプレイによる払い出し
+    const replayOut = (totalSpins * replayProb) * 3;
 
+    // 残りがブドウ
     const remainingOut = totalOut - bonusOut - cherryOut - replayOut;
 
-    // ブドウの払い出しは8枚 (6号機ジャグラー)
+    // ブドウの払い出しは8枚 (6号機ジャグラー共通)
     const grapeCount = Math.max(0, Math.round(remainingOut / 8));
 
     return grapeCount;
