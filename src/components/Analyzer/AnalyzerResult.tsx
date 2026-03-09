@@ -45,43 +45,43 @@ const AnalyzerResult: React.FC<AnalyzerResultProps> = ({
                 判別結果
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div className="text-center p-6 bg-gray-900/50 rounded-xl border border-gray-700">
-                    <p className="text-gray-400 text-sm mb-1 font-bold">最も可能性の高い設定</p>
-                    <div className="text-6xl font-black text-juggler-neonYellow drop-shadow-[0_0_15px_rgba(255,255,0,0.5)]">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div className="text-center p-4 sm:p-6 bg-gray-900/50 rounded-xl border border-gray-700">
+                    <p className="text-gray-400 text-[10px] sm:text-sm mb-1 font-bold">最も可能性の高い設定</p>
+                    <div className="text-4xl sm:text-6xl font-black text-juggler-neonYellow drop-shadow-[0_0_15px_rgba(255,255,0,0.5)]">
                         設定 {bestSetting.setting}
                     </div>
-                    <div className="mt-3 flex justify-center gap-4 text-sm">
+                    <div className="mt-2 sm:mt-3 flex justify-center gap-3 sm:gap-4 text-[10px] sm:text-sm">
                         <span className="text-gray-300">
                             期待度: <span className="font-bold text-juggler-neonPink">{bestSetting.probability.toFixed(1)}%</span>
                         </span>
                         <span className="text-gray-300">
-                            適合(p値): <span className={`font-bold ${bestSetting.pValue < 5 ? 'text-red-500' : 'text-cyan-400'}`}>
+                            適合度: <span className={`font-bold ${bestSetting.pValue < 5 ? 'text-red-500' : 'text-cyan-400'}`}>
                                 {bestSetting.pValue.toFixed(2)}%
                             </span>
                         </span>
                     </div>
                 </div>
 
-                <div className="flex flex-col justify-center space-y-4">
-                    <div className="p-4 bg-gray-900/50 rounded-lg border border-gray-700 flex items-center gap-4">
-                        <div className="bg-green-500/10 p-2 rounded-full text-green-400">
-                            <TrendingUp size={24} />
+                <div className="grid grid-cols-2 md:flex md:flex-col gap-3">
+                    <div className="p-3 sm:p-4 bg-gray-900/50 rounded-lg border border-gray-700 flex items-center gap-2 sm:gap-4">
+                        <div className="bg-green-500/10 p-1.5 sm:p-2 rounded-full text-green-400">
+                            <TrendingUp size={18} className="sm:w-6 sm:h-6" />
                         </div>
                         <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wider font-bold">期待機械割 (加重平均)</p>
-                            <p className="text-2xl font-black text-white">{expectedPayout.toFixed(2)}%</p>
+                            <p className="text-[9px] sm:text-xs text-gray-500 uppercase font-bold">期待機械割</p>
+                            <p className="text-sm sm:text-2xl font-black text-white">{expectedPayout.toFixed(2)}%</p>
                         </div>
                     </div>
 
-                    <div className="p-4 bg-gray-900/50 rounded-lg border border-gray-700 flex items-center gap-4">
-                        <div className="bg-yellow-500/10 p-2 rounded-full text-yellow-500">
-                            <Coins size={24} />
+                    <div className="p-3 sm:p-4 bg-gray-900/50 rounded-lg border border-gray-700 flex items-center gap-2 sm:gap-4">
+                        <div className="bg-yellow-500/10 p-1.5 sm:p-2 rounded-full text-yellow-500">
+                            <Coins size={18} className="sm:w-6 sm:h-6" />
                         </div>
                         <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wider font-bold">この先の期待収支 (3000G)</p>
-                            <p className={`text-2xl font-black ${expectedDifference(3000) >= 0 ? 'text-juggler-neonYellow' : 'text-red-400'}`}>
-                                {expectedDifference(3000) >= 0 ? '+' : ''}{Math.round(expectedDifference(3000)).toLocaleString()} 枚
+                            <p className="text-[9px] sm:text-xs text-gray-500 uppercase font-bold">期待収支(3kG)</p>
+                            <p className={`text-sm sm:text-2xl font-black ${expectedDifference(3000) >= 0 ? 'text-juggler-neonYellow' : 'text-red-400'}`}>
+                                {expectedDifference(3000) >= 0 ? '+' : ''}{Math.round(expectedDifference(3000)).toLocaleString()}
                             </p>
                         </div>
                     </div>
@@ -92,10 +92,9 @@ const AnalyzerResult: React.FC<AnalyzerResultProps> = ({
                 <div className="mb-6 p-4 bg-red-900/20 border border-red-900/50 rounded-lg flex items-start gap-3">
                     <Info size={18} className="text-red-400 mt-1 shrink-0" />
                     <div>
-                        <p className="text-sm font-bold text-red-200 mb-1">理論値からの乖離注意</p>
-                        <p className="text-xs text-red-300 leading-relaxed">
-                            現在、判別された設定の理論上の挙動から統計的に大きく外れています。
-                            短期間のヒキ強/ヒキ弱、あるいは他の設定を考慮するか、ホールの状況を再確認してください。
+                        <p className="text-xs font-bold text-red-200 mb-1">理論値からの乖離注意</p>
+                        <p className="text-[10px] text-red-300 leading-relaxed">
+                            統計的に稀な挙動です。短期間のヒキやホールの根拠を再確認してください。
                         </p>
                     </div>
                 </div>
@@ -104,8 +103,8 @@ const AnalyzerResult: React.FC<AnalyzerResultProps> = ({
             <div className="h-64 w-full mb-8">
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={chartData}>
-                        <XAxis dataKey="name" stroke="#9ca3af" tick={{ fontSize: 12 }} />
-                        <YAxis stroke="#9ca3af" tick={{ fontSize: 12 }} unit="%" />
+                        <XAxis dataKey="name" stroke="#9ca3af" tick={{ fontSize: 10 }} />
+                        <YAxis stroke="#9ca3af" tick={{ fontSize: 10 }} unit="%" />
                         <Tooltip
                             contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151' }}
                             itemStyle={{ color: '#fff' }}
@@ -121,42 +120,49 @@ const AnalyzerResult: React.FC<AnalyzerResultProps> = ({
                 </ResponsiveContainer>
             </div>
 
-            <div className="overflow-x-auto">
-                <table className="w-full text-sm text-center">
-                    <thead className="text-xs text-gray-400 uppercase bg-gray-900">
+            <div className="overflow-x-auto -mx-6 px-6">
+                <table className="w-full text-[10px] sm:text-sm text-center border-collapse">
+                    <thead className="text-[9px] sm:text-xs text-gray-400 uppercase bg-gray-900/80 sticky top-0">
                         <tr>
-                            <th className="px-3 py-3 border-b border-gray-700">設定</th>
-                            <th className="px-3 py-3 border-b border-gray-700">期待度</th>
-                            <th className="px-3 py-3 border-b border-gray-700">機械割</th>
-                            <th className="px-3 py-3 border-b border-gray-700 text-red-400">BIG</th>
-                            <th className="px-3 py-3 border-b border-gray-700 text-green-400">REG</th>
+                            <th className="px-1 py-3 border-b border-gray-700">設定</th>
+                            <th className="px-1 py-3 border-b border-gray-700">期待度</th>
+                            <th className="px-1 py-3 border-b border-gray-700 text-juggler-neonYellow">機械割</th>
+                            <th className="px-1 py-3 border-b border-gray-700 text-red-400">BIG</th>
+                            <th className="px-1 py-3 border-b border-gray-700 text-blue-400">REG</th>
+                            <th className="px-1 py-3 border-b border-gray-700 text-green-400">ぶどう</th>
                         </tr>
                     </thead>
-                    <tbody className="bg-gray-800">
-                        <tr className="bg-gray-700/30">
-                            <td className="px-3 py-3 font-bold text-white">現在値</td>
-                            <td className="px-3 py-3">-</td>
-                            <td className="px-3 py-3 font-bold">
+                    <tbody className="bg-gray-800/40">
+                        <tr className="bg-gray-700/50 border-b border-gray-600">
+                            <td className="px-1 py-3 font-bold text-white whitespace-nowrap">現在値</td>
+                            <td className="px-1 py-3 text-gray-500">-</td>
+                            <td className="px-1 py-3 font-bold text-juggler-neonYellow whitespace-nowrap">
                                 {inputData.totalSpins > 0 ? (
                                     ((inputData.bigCount * machine.bigPayout + inputData.regCount * machine.regPayout + (inputData.grapeCount || 0) * 8) / (inputData.totalSpins * 3) * 100).toFixed(1)
                                 ) : '-'}%
                             </td>
-                            <td className="px-3 py-3">
+                            <td className="px-1 py-3 text-red-300 whitespace-nowrap">
                                 1/{inputData.bigCount > 0 ? (inputData.totalSpins / inputData.bigCount).toFixed(1) : '-'}
                             </td>
-                            <td className="px-3 py-3">
+                            <td className="px-1 py-3 text-blue-300 whitespace-nowrap">
                                 1/{inputData.regCount > 0 ? (inputData.totalSpins / inputData.regCount).toFixed(1) : '-'}
+                            </td>
+                            <td className="px-1 py-3 text-green-300 whitespace-nowrap font-mono text-[9px] sm:text-[11px]">
+                                1/{inputData.grapeCount > 0 ? (inputData.totalSpins / inputData.grapeCount).toFixed(3) : '-'}
                             </td>
                         </tr>
                         {results.map((r) => {
                             const s = machine.settings[r.setting];
                             return (
-                                <tr key={r.setting} className="border-t border-gray-700">
-                                    <td className="px-3 py-2 text-gray-300 font-bold">設定{r.setting}</td>
-                                    <td className="px-3 py-2 font-mono text-juggler-neonPink">{r.probability.toFixed(1)}%</td>
-                                    <td className="px-3 py-2 text-gray-400">{s.payout.toFixed(1)}%</td>
-                                    <td className="px-3 py-2 text-gray-400">1/{s.big}</td>
-                                    <td className="px-3 py-2 text-gray-400">1/{s.reg}</td>
+                                <tr key={r.setting} className="border-t border-gray-700/50 hover:bg-gray-700/30 transition-colors">
+                                    <td className="px-1 py-2.5 text-gray-400 font-bold italic">#{r.setting}</td>
+                                    <td className="px-1 py-2.5 font-mono text-juggler-neonPink font-bold">{r.probability.toFixed(1)}%</td>
+                                    <td className="px-1 py-2.5 text-gray-300">{s.payout.toFixed(1)}%</td>
+                                    <td className="px-1 py-2.5 text-gray-400">1/{s.big.toFixed(0)}</td>
+                                    <td className="px-1 py-2.5 text-gray-400">1/{s.reg.toFixed(0)}</td>
+                                    <td className="px-1 py-2.5 text-gray-400 font-mono text-[9px] sm:text-[11px]">
+                                        1/{s.grape ? s.grape.toFixed(3) : '-'}
+                                    </td>
                                 </tr>
                             );
                         })}
