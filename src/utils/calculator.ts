@@ -27,6 +27,7 @@ interface InputData {
     cherryReg?: number;
     // 設定配分 (Prior probabilities) - 合計100%になる配列
     priors?: { [key: number]: number };
+    mode?: 'basic' | 'detailed';
 }
 
 /**
@@ -36,7 +37,7 @@ export const calculateSettingLikelihood = (
     machine: MachineSpec,
     data: InputData
 ): EstimationResult | null => {
-    const { totalSpins, bigCount, regCount, grapeCount, priors } = data;
+    const { totalSpins, bigCount, regCount, grapeCount, priors, mode } = data;
 
     if (totalSpins === 0) {
         return null;
@@ -52,9 +53,7 @@ export const calculateSettingLikelihood = (
     const activePriors = priors || defaultPriors;
 
     // 詳細モードかどうかを判定
-    const isDetailedMode =
-        (data.isolatedBig !== undefined || data.cherryBig !== undefined ||
-            data.isolatedReg !== undefined || data.cherryReg !== undefined);
+    const isDetailedMode = mode === 'detailed';
 
     // 各設定の対数尤度とカイ二乗値を計算
     const logLikelihoods: { [key: number]: number } = {};

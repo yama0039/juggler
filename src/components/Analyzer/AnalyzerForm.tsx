@@ -23,6 +23,8 @@ interface AnalyzerFormProps {
     priors: { [key: number]: number };
     onPriorChange: (setting: number, value: number) => void;
     selectedMachineSpec: MachineSpec;
+    mode: 'basic' | 'detailed';
+    onModeChange: (mode: 'basic' | 'detailed') => void;
 }
 
 const AnalyzerForm: React.FC<AnalyzerFormProps> = ({
@@ -33,9 +35,10 @@ const AnalyzerForm: React.FC<AnalyzerFormProps> = ({
     onInputChange,
     priors,
     onPriorChange,
-    selectedMachineSpec
+    selectedMachineSpec,
+    mode,
+    onModeChange
 }) => {
-    const [mode, setMode] = React.useState<'basic' | 'detailed'>('basic');
     const [showPriors, setShowPriors] = React.useState(false);
 
     const handleBackCalc = () => {
@@ -55,14 +58,14 @@ const AnalyzerForm: React.FC<AnalyzerFormProps> = ({
             <div className="flex justify-between items-center mb-6">
                 <div className="flex bg-gray-900 rounded-lg p-1">
                     <button
-                        onClick={() => setMode('basic')}
+                        onClick={() => onModeChange('basic')}
                         className={`px-4 py-1 rounded-md text-sm font-bold transition-colors ${mode === 'basic' ? 'bg-gray-700 text-white' : 'text-gray-500 hover:text-gray-300'
                             }`}
                     >
                         通常
                     </button>
                     <button
-                        onClick={() => setMode('detailed')}
+                        onClick={() => onModeChange('detailed')}
                         className={`px-4 py-1 rounded-md text-sm font-bold transition-colors ${mode === 'detailed' ? 'bg-juggler-neonPink text-white' : 'text-gray-500 hover:text-gray-300'
                             }`}
                     >

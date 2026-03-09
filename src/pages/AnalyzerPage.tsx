@@ -9,6 +9,7 @@ import { calculateSettingLikelihood } from '../utils/calculator';
 
 const AnalyzerPage = () => {
     const [selectedMachineId, setSelectedMachineId] = useState<string>(machineSpecs[0].id);
+    const [mode, setMode] = useState<'basic' | 'detailed'>('basic');
     const location = useLocation();
 
     const [inputData, setInputData] = useState<{
@@ -86,7 +87,8 @@ const AnalyzerPage = () => {
             cherryBig: inputData.cherryBig ? parseInt(inputData.cherryBig) : undefined,
             isolatedReg: inputData.isolatedReg ? parseInt(inputData.isolatedReg) : undefined,
             cherryReg: inputData.cherryReg ? parseInt(inputData.cherryReg) : undefined,
-            priors: priors
+            priors: priors,
+            mode: mode
         };
 
         return calculateSettingLikelihood(selectedMachine, data);
@@ -108,6 +110,8 @@ const AnalyzerPage = () => {
                 priors={priors}
                 onPriorChange={handlePriorChange}
                 selectedMachineSpec={selectedMachine}
+                mode={mode}
+                onModeChange={setMode}
             />
 
             {results && (
