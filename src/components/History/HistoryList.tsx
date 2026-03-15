@@ -19,6 +19,10 @@ const HistoryItem: React.FC<{ record: JugglerRecord; onDelete?: (id: string) => 
     const balance = record.recovery - record.investment;
     const isWin = balance >= 0;
 
+    const inCoins = record.total_spins * 3;
+    const outCoins = inCoins + balance;
+    const payoutRate = inCoins > 0 ? (outCoins / inCoins) * 100 : 0;
+
     const handleToggle = () => {
         setIsExpanded(!isExpanded);
     };
@@ -54,8 +58,11 @@ const HistoryItem: React.FC<{ record: JugglerRecord; onDelete?: (id: string) => 
                         <p className={clsx("text-xl font-bold font-mono", isWin ? "text-juggler-neonYellow" : "text-red-400")}>
                             {balance > 0 ? '+' : ''}{balance.toLocaleString()} 枚
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-[11px] text-gray-400 mb-0.5">
                             投資: {record.investment.toLocaleString()} / 回収: {record.recovery.toLocaleString()}
+                        </p>
+                        <p className={clsx("text-xs font-bold font-mono", payoutRate >= 100 ? "text-juggler-neonPink" : "text-blue-400")}>
+                            割: {payoutRate.toFixed(2)}%
                         </p>
                     </div>
 
