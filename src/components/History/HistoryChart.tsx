@@ -12,11 +12,14 @@ const HistoryChart: React.FC<HistoryChartProps> = ({ records }) => {
     const sortedRecords = [...records].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
     let cumulativeBalance = 0;
+    let cumulativeSpins = 0;
     const data = sortedRecords.map(record => {
         const balance = record.recovery - record.investment;
         cumulativeBalance += balance;
+        cumulativeSpins += record.total_spins;
         return {
             date: record.date,
+            spins: cumulativeSpins,
             balance: balance,
             cumulative: cumulativeBalance
         };
@@ -53,12 +56,28 @@ const HistoryChart: React.FC<HistoryChartProps> = ({ records }) => {
                 <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={data}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                        <XAxis dataKey="date" stroke="#9ca3af" tick={{ fontSize: 10 }} tickFormatter={(val) => val.slice(5)} />
+                        <XAxis 
+                            dataKey="spins" 
+                            stroke="#9ca3af" 
+                            tick={{ fontSize: 10 }} 
+                            tickFormatter={(val) => `${(val / 1000).toFixed(1)}kG`}
+                            label={{ value: '総回転数', position: 'insideBottomRight', offset: -5, fill: '#9ca3af', fontSize: 10 }}
+                        />
                         <YAxis stroke="#9ca3af" tick={{ fontSize: 10 }} />
                         <Tooltip
-                            contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', color: '#fff' }}
-                            itemStyle={{ color: '#fff' }}
-                            formatter={(value: any) => [`${value}枚`, '累積収支']}
+                            content={({ active, payload }) => {
+                                if (active && payload && payload.length) {
+                                    const data = payload[0].payload;
+                                    return (
+                                        <div className="bg-gray-900 border border-gray-700 p-3 rounded-lg shadow-xl text-xs">
+                                            <p className="text-gray-400 mb-1">{data.date}</p>
+                                            <p className="text-juggler-neonPink font-bold">累計: {data.spins.toLocaleString()} G</p>
+                                            <p className="text-white mt-1 font-black">累計収支: <span className={data.cumulative >= 0 ? "text-juggler-neonYellow" : "text-red-500"}>{data.cumulative.toLocaleString()} 枚</span></p>
+                                        </div>
+                                    );
+                                }
+                                return null;
+                            }}
                         />
                         <Line type="monotone" dataKey="cumulative" stroke="#ff00ff" strokeWidth={2} dot={{ r: 4, fill: '#ff00ff' }} activeDot={{ r: 6 }} />
                     </LineChart>

@@ -11,6 +11,13 @@ const HistoryPage = () => {
     const { getRecords, deleteRecord, loading, error } = useRecords();
     const [records, setRecords] = useState<JugglerRecord[]>([]);
     const [selectedModel, setSelectedModel] = useState<string>('all');
+    const [selectedHall, setSelectedHall] = useState<string>('all');
+
+    // ユニークなホール名を取得
+    const uniqueHalls = useMemo(() => {
+        const halls = records.map(r => r.hall_name).filter(Boolean);
+        return Array.from(new Set(halls)).sort();
+    }, [records]);
 
     const fetchRecords = async () => {
         const data = await getRecords();
@@ -31,9 +38,12 @@ const HistoryPage = () => {
     };
 
     const filteredRecords = useMemo(() => {
-        if (selectedModel === 'all') return records;
-        return records.filter(r => r.machine_type === selectedModel);
-    }, [records, selectedModel]);
+        return records.filter(r => {
+            const matchesModel = selectedModel === 'all' || r.machine_type === selectedModel;
+            const matchesHall = selectedHall === 'all' || r.hall_name === selectedHall;
+            return matchesModel && matchesHall;
+        });
+    }, [records, selectedModel, selectedHall]);
 
     return (
         <div className="max-w-3xl mx-auto pb-12 px-4 sm:px-0">
@@ -43,7 +53,7 @@ const HistoryPage = () => {
                     履歴・収支
                 </h2>
 
-                <div className="flex items-center text-sm font-normal">
+                <div className="flex flex-col sm:flex-row gap-2 text-sm font-normal">
                     <select
                         value={selectedModel}
                         onChange={(e) => setSelectedModel(e.target.value)}
@@ -52,6 +62,17 @@ const HistoryPage = () => {
                         <option value="all">すべての機種</option>
                         {machineSpecs.map(spec => (
                             <option key={spec.id} value={spec.id}>{spec.name}</option>
+                        ))}
+                    </select>
+
+                    <select
+                        value={selectedHall}
+                        onChange={(e) => setSelectedHall(e.target.value)}
+                        className="bg-gray-800 border border-gray-700 text-white rounded px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-juggler-neonPink w-full sm:w-auto"
+                    >
+                        <option value="all">すべての店舗</option>
+                        {uniqueHalls.map(hall => (
+                            <option key={hall} value={hall}>{hall}</option>
                         ))}
                     </select>
                 </div>

@@ -17,15 +17,17 @@ const HistorySummary: React.FC<HistorySummaryProps> = ({ records }) => {
                 totalSpins: acc.totalSpins + record.total_spins,
                 totalBig: acc.totalBig + big,
                 totalReg: acc.totalReg + reg,
+                totalGrape: acc.totalGrape + (record.grape || 0),
                 totalInvestment: acc.totalInvestment + record.investment,
                 totalRecovery: acc.totalRecovery + record.recovery,
             };
         },
-        { totalSpins: 0, totalBig: 0, totalReg: 0, totalInvestment: 0, totalRecovery: 0 }
+        { totalSpins: 0, totalBig: 0, totalReg: 0, totalGrape: 0, totalInvestment: 0, totalRecovery: 0 }
     );
 
     const bigProb = stats.totalBig > 0 ? (stats.totalSpins / stats.totalBig).toFixed(1) : '-';
     const regProb = stats.totalReg > 0 ? (stats.totalSpins / stats.totalReg).toFixed(1) : '-';
+    const grapeProb = stats.totalGrape > 0 ? (stats.totalSpins / stats.totalGrape).toFixed(3) : '-';
 
     const balance = stats.totalRecovery - stats.totalInvestment;
     const inCoins = stats.totalSpins * 3;
@@ -37,11 +39,16 @@ const HistorySummary: React.FC<HistorySummaryProps> = ({ records }) => {
             <div className="bg-gray-800 p-2 sm:p-3 rounded-lg border border-gray-700 shadow-sm flex flex-col justify-center">
                 <p className="text-gray-400 text-[10px] sm:text-xs mb-0.5 flex items-center">
                     <Disc size={10} className="mr-1 text-blue-400" />
-                    回転
+                    回転 / ぶどう
                 </p>
-                <p className="text-lg sm:text-xl font-bold font-mono text-white leading-tight">
-                    {stats.totalSpins.toLocaleString()}<span className="text-[10px] font-normal text-gray-500 ml-0.5">G</span>
-                </p>
+                <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-1.5">
+                    <p className="text-lg sm:text-xl font-bold font-mono text-white leading-tight">
+                        {stats.totalSpins.toLocaleString()}<span className="text-[10px] sm:text-xs font-normal text-gray-500 ml-0.5">G</span>
+                    </p>
+                    <p className="text-[10px] sm:text-xs font-mono text-green-400">
+                        1/{grapeProb}
+                    </p>
+                </div>
             </div>
             
             <div className="bg-gray-800 p-2 sm:p-3 rounded-lg border border-gray-700 shadow-sm">

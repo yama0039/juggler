@@ -4,7 +4,7 @@
  */
 let audioCtx: AudioContext | null = null;
 
-export const playClickSound = () => {
+export const playClickSound = (volume: number = 0.1) => {
     try {
         if (!audioCtx) {
             audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -21,8 +21,8 @@ export const playClickSound = () => {
         osc.frequency.setValueAtTime(800, audioCtx.currentTime);
         osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05);
 
-        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+        gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01 * (volume / 0.1), audioCtx.currentTime + 0.05);
 
         osc.connect(gain);
         gain.connect(audioCtx.destination);

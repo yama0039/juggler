@@ -1,5 +1,6 @@
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { SettingsProvider } from './contexts/SettingsContext';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 import Home from './pages/Home';
@@ -12,22 +13,24 @@ import CounterPage from './pages/CounterPage';
 function App() {
   return (
     <AuthProvider>
-      <HashRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Home />} />
-            <Route path="login" element={<LoginPage />} />
-            <Route path="analyzer" element={<AnalyzerPage />} />
+      <SettingsProvider>
+        <HashRouter>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Home />} />
+              <Route path="login" element={<LoginPage />} />
+              <Route path="analyzer" element={<AnalyzerPage />} />
 
-            {/* Protected Routes */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="record" element={<RecordPage />} />
-              <Route path="history" element={<HistoryPage />} />
-              <Route path="counter" element={<CounterPage />} />
+              {/* Protected Routes */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="record" element={<RecordPage />} />
+                <Route path="history" element={<HistoryPage />} />
+                <Route path="counter" element={<CounterPage />} />
+              </Route>
             </Route>
-          </Route>
-        </Routes>
-      </HashRouter>
+          </Routes>
+        </HashRouter>
+      </SettingsProvider>
     </AuthProvider>
   );
 }

@@ -2,6 +2,7 @@ import React from 'react';
 import clsx from 'clsx';
 import { vibrate } from '../../utils/haptics';
 import { playClickSound } from '../../utils/audio';
+import { useSettings } from '../../contexts/SettingsContext';
 
 interface CircleCounterProps {
     label: string;
@@ -13,9 +14,11 @@ interface CircleCounterProps {
 }
 
 const CircleCounter: React.FC<CircleCounterProps> = ({ label, count, totalSpins, color, onClick, onDecrement }) => {
+    const { volume } = useSettings();
+
     const handleButtonClick = () => {
         vibrate(30); // 30ms short vibration (Android only)
-        playClickSound(); // Procedural click sound
+        playClickSound(volume); // Procedural click sound with custom volume
         onClick();
     };
     // Probability calculation

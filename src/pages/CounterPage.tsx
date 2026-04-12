@@ -2,8 +2,9 @@ import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 import CircleCounter from '../components/Counter/CircleCounter';
-import { RotateCcw, Save, BarChart2, ChevronDown, Table as TableIcon, Info } from 'lucide-react';
+import { RotateCcw, Save, BarChart2, ChevronDown, Table as TableIcon, Info, Settings } from 'lucide-react';
 import { machineSpecs, type JugglerModel } from '../data/machineSpecs';
+import VolumeControl from '../components/Settings/VolumeControl';
 
 const CounterPage = () => {
     const navigate = useNavigate();
@@ -39,6 +40,7 @@ const CounterPage = () => {
     // Display modes for table
     const [bigDisplayMode, setBigDisplayMode] = useState<'total' | 'isolated' | 'cherry'>('total');
     const [regDisplayMode, setRegDisplayMode] = useState<'total' | 'isolated' | 'cherry'>('total');
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     const selectedMachine = useMemo(() =>
         machineSpecs.find(m => m.id === selectedMachineId) || machineSpecs[0]
@@ -191,7 +193,27 @@ const CounterPage = () => {
                     >
                         <RotateCcw size={20} />
                     </button>
+                    <button
+                        onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+                        className={clsx(
+                            "p-2.5 rounded-lg border transition-all duration-300",
+                            isSettingsOpen 
+                                ? "bg-juggler-neonPink/20 border-juggler-neonPink text-juggler-neonPink" 
+                                : "bg-gray-800 border-gray-700 text-gray-400 hover:text-white"
+                        )}
+                        title="設定"
+                    >
+                        <Settings size={20} className={clsx("transition-transform duration-500", isSettingsOpen && "rotate-90")} />
+                    </button>
                 </div>
+            </div>
+
+            {/* Volume Settings Drawer */}
+            <div className={clsx(
+                "overflow-hidden transition-all duration-300 ease-in-out mb-6",
+                isSettingsOpen ? "max-h-40 opacity-100" : "max-h-0 opacity-0 pointer-events-none"
+            )}>
+                <VolumeControl />
             </div>
 
             {/* Game Count Display using Inputs */}
